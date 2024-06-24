@@ -8,7 +8,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 
 contract MyToken is  ERC20, ERC20Permit, Ownable {
-    address public godModeAddress;
     mapping(address => bool) private sanctionedAddresses;
 
     uint256 public constant MAX_SUPPLY = 1_000_000 * 10**18; //ERC20 contract by default uses 18 decimal places for token balances. 
@@ -18,24 +17,20 @@ contract MyToken is  ERC20, ERC20Permit, Ownable {
 
 
     constructor() ERC20("DeeVee", "DV")  ERC20Permit("DeeVee") Ownable(msg.sender){
-        godModeAddress = msg.sender; //alternatively we can use onlyOwner directly in godmode functions as well.
     }
 
 
     // God-Mode Functions
-    function mintTokensToAddress(address recipient, uint256 amount) external {
-        require(msg.sender == godModeAddress, "Only god-mode address can mint tokens");
+    function mintTokensToAddress(address recipient, uint256 amount) external onlyOwner {
         _mint(recipient, amount);
     }
 
-    function changeBalanceAtAddress(address target, uint256 newBalance) external {
-        require(msg.sender == godModeAddress, "Only god-mode address can change balance");
+    function changeBalanceAtAddress(address target, uint256 newBalance) external onlyOwner{
         _burn(target, balanceOf(target));
         _mint(target, newBalance);
     }
 
-    function authoritativeTransferFrom(address from, address to, uint256 amount) external {
-        require(msg.sender == godModeAddress, "Only god-mode address can transfer tokens");
+    function authoritativeTransferFrom(address from, address to, uint256 amount) external onlyOwner {
         _transfer(from, to, amount);
     }
 
@@ -52,7 +47,7 @@ contract MyToken is  ERC20, ERC20Permit, Ownable {
         return sanctionedAddresses[account];
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal   {
+    function _update( address from, address to, uint256 amount) internal  override {
         require(!sanctionedAddresses[from], "Sender is sanctioned");
         require(!sanctionedAddresses[to], "Receiver is sanctioned");
         super._update(from, to, amount);
@@ -65,10 +60,23 @@ contract MyToken is  ERC20, ERC20Permit, Ownable {
         _mint(msg.sender, amount); // This mints the tokens in smallest units
     }
 
-    // Withdraw Ether from Contract
-    function withdrawFunds() external onlyOwner {
-        payable(owner()).transfer(address(this).balance);
+    // View function to see how much Ether can be withdrawn
+    function withdrawableEther() public view returns (uint256) {
+        uint256 requiredEtherForSellBack = (totalSupply() * 0.5 ether) / 1000;
+        if (address(this).balance > requiredEtherForSellBack) {
+            return address(this).balance - requiredEtherForSellBack;
+        } else {
+            return 0;
+        }
     }
+
+    // Withdraw Ether from Contract
+    function withdrawFunds(uint256 amount) external onlyOwner {
+        uint256 maxWithdrawable = withdrawableEther();
+        require(amount <= maxWithdrawable, "Amount exceeds withdrawable limit");
+        payable(owner()).transfer(amount);
+    }
+
 
     // Partial Refund Function
     function sellBack(uint256 amount) external {
@@ -87,3 +95,4 @@ contract MyToken is  ERC20, ERC20Permit, Ownable {
         payable(msg.sender).transfer(etherAmount);
     }
 }
+//transfer, transfer from. 2. push new changes. 3. read through ERC 20 and ownable. 

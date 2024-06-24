@@ -490,19 +490,6 @@
 				"type": "function"
 			},
 			{
-				"inputs": [],
-				"name": "godModeAddress",
-				"outputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
 				"inputs": [
 					{
 						"internalType": "address",
@@ -753,10 +740,29 @@
 				"type": "function"
 			},
 			{
-				"inputs": [],
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
 				"name": "withdrawFunds",
 				"outputs": [],
 				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "withdrawableEther",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
 				"type": "function"
 			}
 		],
@@ -927,7 +933,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"contracts/MyToken.sol": "MyToken"
+			"module-1/OpenZeppelin ERC20 - 1/contracts/MyToken.sol": "MyToken"
 		},
 		"evmVersion": "shanghai",
 		"libraries": {},
@@ -1085,12 +1091,12 @@
 				"dweb:/ipfs/QmVBEei6aTnvYNZp2CHYVNKyZS4q1KkjANfY39WVXZXVoT"
 			]
 		},
-		"contracts/MyToken.sol": {
-			"keccak256": "0x194bdfa919c0bcd00411a56d9def6b7ae87fe3e1bfb6cdc1aae3b8cfa22194ec",
+		"module-1/OpenZeppelin ERC20 - 1/contracts/MyToken.sol": {
+			"keccak256": "0x9025a15cb626f45bfde77f38c049c1fbac942cf72d1cc61d4eff1ffadba3203c",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://f4080a364293d14cdcb7506a64d102c8b0bc4762597c29bc4c62be9bf6b7722a",
-				"dweb:/ipfs/QmWFamfoHowqFqHwum5EToY2PWnoeLeSS7VGBst7U522Ew"
+				"bzz-raw://27503519bf059d447d8440784c7c1ab2338d67a1a9d1d9fea7f783699fa8b630",
+				"dweb:/ipfs/QmdTZLyXGCdhsxEdCuMwPNjM8dLdbHNN7vBFQyr73UdZxJ"
 			]
 		}
 	},
