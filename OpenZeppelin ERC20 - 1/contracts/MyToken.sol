@@ -15,7 +15,6 @@ contract MyToken is  ERC20, ERC20Permit, Ownable {
 
 
 
-
     constructor() ERC20("DeeVee", "DV")  ERC20Permit("DeeVee") Ownable(msg.sender){
     }
 
@@ -62,7 +61,7 @@ contract MyToken is  ERC20, ERC20Permit, Ownable {
 
     // View function to see how much Ether can be withdrawn
     function withdrawableEther() public view returns (uint256) {
-        uint256 requiredEtherForSellBack = (totalSupply() * 0.5 ether) / 1000;
+        uint256 requiredEtherForSellBack = (totalSupply() * 5 ) / 10000;
         if (address(this).balance > requiredEtherForSellBack) {
             return address(this).balance - requiredEtherForSellBack;
         } else {
@@ -78,21 +77,14 @@ contract MyToken is  ERC20, ERC20Permit, Ownable {
     }
 
 
-    // Partial Refund Function
+// Partial Refund Function
     function sellBack(uint256 amount) external {
        require(amount > 0, "Amount must be greater than zero");
-// Approve this contract to spend 'amount' tokens on behalf of the seller
-    bool approvalSuccess = ERC20(address(this)).approve(msg.sender, amount);
-    require(approvalSuccess, "Approval failed");
 
-    // Transfer tokens from seller to this contract
-    require(ERC20(address(this)).transferFrom(msg.sender, address(this), amount), "Transfer failed");
-          // Multiplication before division to minimize truncation errors
     uint256 etherAmount = (amount * 0.5 ether) / 1000;
         require(address(this).balance >= etherAmount, "Contract does not have enough ether");
         
-        _burn(address(this), amount);
+        _burn(msg.sender, amount);
         payable(msg.sender).transfer(etherAmount);
     }
 }
-//transfer, transfer from. 2. push new changes. 3. read through ERC 20 and ownable. 
