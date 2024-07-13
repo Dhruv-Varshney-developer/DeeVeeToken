@@ -1,0 +1,14 @@
+# Ignore dependencies directory
+.deps/
+
+# Ignore Git directory
+.git/
+
+# Ignore state files
+.states/
+
+# Ignore scripts
+.scripts/
+
+# Ignore artifacts folders in any module
+artifacts/
