@@ -4,11 +4,13 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract MyToken is ERC20, ERC20Permit, Ownable {
+contract MyToken is ERC20, ERC20Permit, Ownable, ReentrancyGuard {
     mapping(address => bool) private sanctionedAddresses;
 
     uint256 public constant MAX_SUPPLY = 1_000_000 * 10 ** 18; //ERC20 contract by default uses 18 decimal places for token balances.
+
     //token amounts are usually in the smallest unit of the token. So, 1_000_000 * 10**18 represents 1,000,000 tokens with 18 decimal places or 1 million * 10^18 smallest unit of token.
 
     constructor()
@@ -65,7 +67,7 @@ contract MyToken is ERC20, ERC20Permit, Ownable {
     }
 
     // Token Sale Function
-    function buyTokens() external payable {
+    function buyTokens() external payable nonReentrant {
         uint256 amount = msg.value * 1000; // This calculates the amount in token smallest units
         require(totalSupply() + amount <= MAX_SUPPLY, "Exceeds maximum supply");
         _mint(msg.sender, amount); // This mints the tokens in smallest units
@@ -89,7 +91,7 @@ contract MyToken is ERC20, ERC20Permit, Ownable {
     }
 
     // Partial Refund Function
-    function sellBack(uint256 amount) external {
+    function sellBack(uint256 amount) external nonReentrant {
         require(amount > 0, "Amount must be greater than zero");
 
         uint256 etherAmount = (amount * 0.5 ether) / 1000;
