@@ -1,48 +1,48 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("MyToken", function () {
-  let myToken;
+describe("PartialRefund", function () {
+  let PartialRefund;
   let owner, addr1;
 
   beforeEach(async function () {
     [owner, addr1] = await ethers.getSigners();
 
-    const MyToken = await ethers.getContractFactory("MyToken");
-    myToken = await MyToken.deploy();
-    await myToken.waitForDeployment();
+    const Partialrefund = await ethers.getContractFactory("PartialRefund");
+    PartialRefund = await Partialrefund.deploy();
+    await PartialRefund.waitForDeployment();
 
     // Get the contract address
-    const myTokenAddress = await myToken.getAddress();
-    console.log("MyToken deployed to:", myTokenAddress);
+    const PartialRefundAddress = await PartialRefund.getAddress();
+    console.log("PartialRefund deployed to:", PartialRefundAddress);
 
     // Mint some tokens to addr1 for testing
-    await myToken.mintTokensToAddress(addr1.address, ethers.parseEther("1000"));
+    await PartialRefund.mintTokensToAddress(addr1.address, ethers.parseEther("1000"));
   });
 
   describe("sellBack", function () {
     it("Should revert if the amount is zero", async function () {
-      await expect(myToken.connect(addr1).sellBack(0)).to.be.revertedWith(
+      await expect(PartialRefund.connect(addr1).sellBack(0)).to.be.revertedWith(
         "Amount must be greater than zero",
       );
     });
 
     it("Should revert if the contract does not have enough ether", async function () {
-      await expect(myToken.connect(addr1).sellBack(500)).to.be.revertedWith(
+      await expect(PartialRefund.connect(addr1).sellBack(500)).to.be.revertedWith(
         "Contract does not have enough ether",
       );
     });
 
     it("Should sell back tokens and transfer ether", async function () {
       // First, fund the contract with some ether
-      const myTokenAddress = await myToken.getAddress();
-      await myToken
+      const PartialRefundAddress = await PartialRefund.getAddress();
+      await PartialRefund
         .connect(owner)
         .buyTokens({ value: ethers.parseEther("10.0") });
 
       // Check initial balances
       const initialBalance = await ethers.provider.getBalance(addr1.address);
-      const contractBalance = await ethers.provider.getBalance(myTokenAddress);
+      const contractBalance = await ethers.provider.getBalance(PartialRefundAddress);
 
       console.log(
         "Contract balance before sellBack:",
@@ -50,12 +50,12 @@ describe("MyToken", function () {
       );
 
       // addr1 sells back 500 tokens
-      await myToken.connect(addr1).sellBack(500);
+      await PartialRefund.connect(addr1).sellBack(500);
 
       // Check final balances
       const finalBalance = await ethers.provider.getBalance(addr1.address);
       const newContractBalance =
-        await ethers.provider.getBalance(myTokenAddress);
+        await ethers.provider.getBalance(PartialRefundAddress);
 
       // Verify that the contract balance decreased by the correct amount
       expect(newContractBalance).to.equal(
