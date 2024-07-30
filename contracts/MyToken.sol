@@ -103,4 +103,7 @@ contract MyToken is ERC20, ERC20Permit, Ownable, ReentrancyGuard {
         _burn(msg.sender, amount);
         payable(msg.sender).transfer(etherAmount);
     }
+
+    // Function to receive Ether. msg.data must be empty
+    receive() external payable {}
 }
