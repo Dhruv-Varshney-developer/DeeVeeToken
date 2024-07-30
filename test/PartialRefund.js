@@ -65,6 +65,13 @@ describe("PartialRefund", function () {
         PartialRefund.connect(addr1).buyTokens({ value: exceedingAmount }),
       ).to.be.revertedWith("Exceeds maximum supply");
     });
+    it("Should allow buying tokens when not exceeding max supply", async function () {
+      const buyAmount = ethers.parseEther("0.1"); // 100 tokens
+      await PartialRefund.connect(addr1).buyTokens({ value: buyAmount });
+      expect(await PartialRefund.balanceOf(addr1.address)).to.equal(
+        ethers.parseEther("100"),
+      );
+    });
   });
 
   describe("withdrawableEther", function () {
@@ -165,6 +172,24 @@ describe("PartialRefund", function () {
       expect(finalBalance).to.be.closeTo(
         initialBalance + ethers.parseEther("0.25"),
         ethers.parseEther("0.01"),
+      );
+    });
+
+    it("Should allow selling back tokens when contract has sufficient ether", async function () {
+      // First, ensure the contract has enough ether
+      await owner.sendTransaction({
+        to: PartialRefundAddress,
+        value: ethers.parseEther("10.0"),
+      });
+
+      const initialBalance = await ethers.provider.getBalance(addr1.address);
+
+      await PartialRefund.connect(addr1).sellBack(100);
+
+      const finalBalance = await ethers.provider.getBalance(addr1.address);
+      expect(finalBalance).to.be.gt(initialBalance);
+      expect(await PartialRefund.balanceOf(addr1.address)).to.equal(
+        ethers.parseEther("1000") - BigInt(100),
       );
     });
   });
